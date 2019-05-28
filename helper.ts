@@ -2,12 +2,13 @@ var shop = require ('./classes/shop.ts');
 var buyer = require ('./classes/buyer.ts');
 var fs = require ('fs-extra');
 var mysql = require('mysql');
+var Model = require('./lab03orm/models/models.ts');
 
 interface SqlConnect {
-    createTodo(body: string, res: any);
-    readTodo(tablename: string, res: any);
-    updTodo(body: string, res: any);
-    deleteTodo(tablename: string, res: any);
+    createTodo(body: string, res: any, req: any);
+    readTodo(tablename: string, res: any, req: any);
+    updTodo(body: string, res: any, req: any);
+    deleteTodo(tablename: string, res: any, req: any);
 }
 
 class SqlReq implements SqlConnect {
@@ -151,9 +152,32 @@ class SqlOrm implements SqlConnect {
     createTodo(body: string, res: any) {
         throw new Error("Method not implemented.");
     }    
-    readTodo(tablename: string, res: any) {
-        throw new Error("Method not implemented.");
-    }
+    readTodo(tablename: string, res: any, req: any) {
+        var code = 500;
+        var message = 'Internal Server Error';
+        var result = '';
+    
+        var page = req.query.page || 1;
+        var limit = req.query.limit || 5;
+        var offset = (page - 1) * limit;
+        if (tablename === 'orders') {
+            Model.Orders
+                .findAll()
+                .then(result => {
+                    code = 200;
+                    message = 'OK';
+                    res.end(JSON.stringify(result));
+                });
+        } else if (tablename === 'shop') {
+            Model.Shop
+                .findAll()
+                .then(result => {
+                    code = 200;
+                    message = 'OK';
+                    res.end(JSON.stringify(result));
+                });
+        };
+    };
     updTodo(body: string, res: any) {
         throw new Error("Method not implemented.");
     }
@@ -162,7 +186,7 @@ class SqlOrm implements SqlConnect {
     }
 }
 
-function newData(res) {
+function newData(res: any) {
     let connect = mysql.createConnection({
         host: "localhost",
         user: "root",
@@ -178,24 +202,42 @@ function newData(res) {
         };
     });
 
-    var order: {'id_order': number, "order_cost": number}[] = new Array();
+    let order: { 'id_order': number, 'order_cost': number }[] = new Array();
+    let shop: { 'id_buyer': number, 'id_order': number}[] = new Array();
+    let n: number = 1000000;
+    for (let i = 0; i < 500000; i++) {
+        order.push({id_order: n, order_cost: Number(generateRow(5))});
+        shop.push({id_buyer: Number(generateRow(6)), id_order: order[i].id_order});
+        n++;
+    };
     connect.query('INSERT INTO orders VALUES ?', order, function (err: any, result: any) {
         if (err) {
+            console.log(result);
             console.log(err.toString());
             res.end(err.toString());
         };
     });
-    var shop: {'id_buyer': number, 'id_order': number}[] = new Array();
-    connect.query('INSERT INTO shop SET ?', shop, function (err: any, result: any) {
+
+    connect.query('INSERT INTO shop VALUES ?', shop, function (err: any, result: any) {
         if (err) {
+            console.log(result);
             console.log(err.toString());
             res.end(err.toString());
         };
-        console.log("Result: " + JSON.stringify(result));
-        res.end("Result:" + '\n' + JSON.stringify(result));
         connect.end();
     });
 };
+
+function generateRow(length) {
+    let result           = '';
+    // Не очень красиво, но зато быстро.
+    let characters       = '0123456789';
+    let charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ };
 
 module.exports = {
     SqlReq, SqlOrm, newData

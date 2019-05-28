@@ -5,7 +5,7 @@ var bodyParser = require("body-parser");
 
 router.post('/neworder', function(req, res, next) {
     var sqlcon = new helper.SqlReq();
-        sqlcon.createTodo(JSON.stringify(req.body), res);
+    sqlcon.createTodo(JSON.stringify(req.body), res);
 });
 
 router.post('/cancord', function(req, res, next) {
@@ -19,7 +19,7 @@ router.put('/newcost', function(req, res, next) {
 });
 
 router.get('/newdata', function(req, res, next) {
-    
+    helper.newData(res);
 });
 
 module.exports = router;
