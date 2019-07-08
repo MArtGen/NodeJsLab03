@@ -3,7 +3,8 @@ const Sequelize = require('sequelize');
 var sequelize = new Sequelize('nodejs', 'root', 'password', {
     host: 'localhost',
     dialect: 'mysql'
-  });
+  }
+);
 
 const Shop = sequelize.define('shop', {
         id_buyer: {
@@ -19,7 +20,8 @@ const Shop = sequelize.define('shop', {
             autoIncrement: false
         }
     }, {
-            tableName: 'shop'
+            timestamps: false,
+            tableName: 'shop',
         });
 
 const Orders = sequelize.define('orders', {
@@ -29,7 +31,7 @@ const Orders = sequelize.define('orders', {
             primaryKey: true,
         },
         order_date: {
-            type: Sequelize.DATETIME(),
+            type: Sequelize.DATE,
             allowNull: false,
             primaryKey: false,
             autoIncrement: false
@@ -39,8 +41,9 @@ const Orders = sequelize.define('orders', {
             allowNull: false,
             primaryKey: false,
             autoIncrement: false
-        },
+        }
     }, {
+            timestamps: false,
             tableName: 'orders'
         });
 

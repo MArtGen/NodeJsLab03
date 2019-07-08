@@ -8,7 +8,7 @@ router.post('/neworder', function(req, res, next) {
     sqlcon.createTodo(JSON.stringify(req.body), res);
 });
 
-router.post('/cancord', function(req, res, next) {
+router.delete('/cancord', function(req, res, next) {
     var sqlcon = new helper.SqlReq();
     sqlcon.deleteTodo(JSON.stringify(req.body), res);
 });
@@ -16,10 +16,6 @@ router.post('/cancord', function(req, res, next) {
 router.put('/newcost', function(req, res, next) {
     var sqlcon = new helper.SqlReq();
     sqlcon.updTodo(JSON.stringify(req.body), res);
-});
-
-router.get('/newdata', function(req, res, next) {
-    helper.newData(res);
 });
 
 module.exports = router;

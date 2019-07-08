@@ -3,8 +3,8 @@ var router = express.Router();
 var helper = require('../../helper.ts');
 
 router.get('/', function(req, res, next) {
-  helper.readTodo('shop', res);
-  res.end("Reading of shop.txt");
+  var sqlcon = new helper.SqlOrm();
+  sqlcon.readTodo('shop', res, req);
 });
 
 module.exports = router;
